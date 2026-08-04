@@ -45,13 +45,19 @@ async function loadData() {
 
     try {
 
-        const response = await fetch(API_URL);
+const response = await fetch(API_URL);
 
-        if (!response.ok) {
-            throw new Error("HTTP " + response.status);
-        }
+console.log("HTTP Status:", response.status);
+console.log("Response URL:", response.url);
 
-        const json = await response.json();
+const text = await response.text();
+
+console.log("Response Text:");
+console.log(text);
+
+const json = JSON.parse(text);
+
+console.log("JSON:", json);
 
         if (!json.status) {
             throw new Error("Status API FALSE");
