@@ -1,12 +1,24 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color"
+          content="#1565c0">
+
     <title>Koleksi Lirik Lagu</title>
 
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest"
+          href="manifest.json">
+
+    <link rel="stylesheet"
+          href="css/style.css">
+
 </head>
 
 <body>
@@ -53,27 +65,95 @@
 <script src="js/app.js"></script>
 
 <script>
+
+/******************************************************
+ * Service Worker
+ ******************************************************/
+
 if ("serviceWorker" in navigator) {
 
-  window.addEventListener("load", () => {
+    window.addEventListener("load", async () => {
 
-    navigator.serviceWorker
-      .register("sw.js")
-      .then(() => {
+        try {
 
-        console.log("Service Worker berhasil didaftarkan");
+            const reg = await navigator.serviceWorker.register("./sw.js");
 
-      })
-      .catch(err => {
+            console.log("Service Worker berhasil.");
 
-        console.error("Service Worker gagal:", err);
+            console.log(reg);
 
-      });
+        }
 
-  });
+        catch (err) {
+
+            console.error("Service Worker gagal.");
+
+            console.error(err);
+
+        }
+
+    });
 
 }
+
+
+/******************************************************
+ * Install PWA
+ ******************************************************/
+
+let deferredPrompt = null;
+
+const btnInstall =
+    document.getElementById("btnInstall");
+
+
+window.addEventListener("beforeinstallprompt", (e) => {
+
+    console.log("beforeinstallprompt");
+
+    e.preventDefault();
+
+    deferredPrompt = e;
+
+    btnInstall.hidden = false;
+
+});
+
+
+btnInstall.addEventListener("click", async () => {
+
+    if (!deferredPrompt) {
+
+        alert("Aplikasi belum siap untuk diinstall.");
+
+        return;
+
+    }
+
+    deferredPrompt.prompt();
+
+    const result =
+        await deferredPrompt.userChoice;
+
+    console.log(result);
+
+    deferredPrompt = null;
+
+    btnInstall.hidden = true;
+
+});
+
+
+window.addEventListener("appinstalled", () => {
+
+    console.log("Aplikasi berhasil diinstall.");
+
+    btnInstall.hidden = true;
+
+});
+
 </script>
-    
+
 </body>
+
 </html>
