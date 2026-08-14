@@ -1,34 +1,42 @@
 /*****************************************************************
  * KOLEKSI LIRIK LAGU
  * File      : sw.js
- * Versi     : 1.0.0
+ * Versi     : 1.1.0
  * Developer : Selsires Kirihio
  *****************************************************************/
 
-const CACHE_NAME = "koleksi-lirik-v1";
+const CACHE_NAME = "koleksi-lirik-v2";
+
+const BASE = "/lirik-lagu-rohani/";
 
 const FILES_TO_CACHE = [
-  "/lirik-lagu-rohani/",
-  "/lirik-lagu-rohani/index.html",
-  "/lirik-lagu-rohani/manifest.json",
-  "/lirik-lagu-rohani/css/style.css",
-  "/lirik-lagu-rohani/js/app.js",
-  "/lirik-lagu-rohani/icons/icon-192.png",
-  "/lirik-lagu-rohani/icons/icon-512.png"
+  BASE,
+  BASE + "index.html",
+  BASE + "manifest.json",
+  BASE + "css/style.css",
+  BASE + "js/app.js",
+  BASE + "icons/icon-192.png",
+  BASE + "icons/icon-512.png"
 ];
 
-//==================================================
-// INSTALL
-//==================================================
+
+/* ==================================================
+   INSTALL
+================================================== */
 
 self.addEventListener("install", event => {
 
-  console.log("Service Worker : Install");
+  console.log("Service Worker: INSTALL");
 
   event.waitUntil(
 
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(FILES_TO_CACHE))
+
+      .then(cache => {
+
+        return cache.addAll(FILES_TO_CACHE);
+
+      })
 
   );
 
@@ -36,13 +44,14 @@ self.addEventListener("install", event => {
 
 });
 
-//==================================================
-// ACTIVATE
-//==================================================
+
+/* ==================================================
+   ACTIVATE
+================================================== */
 
 self.addEventListener("activate", event => {
 
-  console.log("Service Worker : Activate");
+  console.log("Service Worker: ACTIVATE");
 
   event.waitUntil(
 
@@ -70,31 +79,46 @@ self.addEventListener("activate", event => {
 
 });
 
-//==================================================
-// FETCH
-//==================================================
+
+/* ==================================================
+   FETCH
+================================================== */
 
 self.addEventListener("fetch", event => {
 
-  // Hanya proses request HTTP/HTTPS
+  const request = event.request;
+
+  /* Hanya GET */
+  if (request.method !== "GET") {
+    return;
+  }
+
+  /* Hanya request HTTP/HTTPS */
   if (
-    event.request.method !== "GET" ||
-    !event.request.url.startsWith("http")
+    request.url.startsWith("http://") === false &&
+    request.url.startsWith("https://") === false
   ) {
+    return;
+  }
+
+  /* Hanya request dari origin website kita */
+  const url = new URL(request.url);
+
+  if (url.origin !== self.location.origin) {
     return;
   }
 
   event.respondWith(
 
-    caches.match(event.request)
+    caches.match(request)
 
-      .then(response => {
+      .then(cachedResponse => {
 
-        if (response) {
-          return response;
+        if (cachedResponse) {
+          return cachedResponse;
         }
 
-        return fetch(event.request)
+        return fetch(request)
 
           .then(networkResponse => {
 
@@ -109,12 +133,10 @@ self.addEventListener("fetch", event => {
               networkResponse.clone();
 
             caches.open(CACHE_NAME)
+
               .then(cache => {
 
-                cache.put(
-                  event.request,
-                  clone
-                );
+                cache.put(request, clone);
 
               });
 
@@ -125,7 +147,7 @@ self.addEventListener("fetch", event => {
           .catch(() => {
 
             return caches.match(
-              "/lirik-lagu-rohani/index.html"
+              BASE + "index.html"
             );
 
           });
