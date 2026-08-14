@@ -76,7 +76,11 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
 
-  if (event.request.method !== "GET") {
+  // Hanya proses request HTTP/HTTPS
+  if (
+    event.request.method !== "GET" ||
+    !event.request.url.startsWith("http")
+  ) {
     return;
   }
 
@@ -101,13 +105,16 @@ self.addEventListener("fetch", event => {
               return networkResponse;
             }
 
-            const clone = networkResponse.clone();
+            const clone =
+              networkResponse.clone();
 
             caches.open(CACHE_NAME)
-
               .then(cache => {
 
-                cache.put(event.request, clone);
+                cache.put(
+                  event.request,
+                  clone
+                );
 
               });
 
@@ -117,7 +124,9 @@ self.addEventListener("fetch", event => {
 
           .catch(() => {
 
-            return caches.match("/lirik-lagu-rohani/index.html");
+            return caches.match(
+              "/lirik-lagu-rohani/index.html"
+            );
 
           });
 
