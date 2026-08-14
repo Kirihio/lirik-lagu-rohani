@@ -11,148 +11,413 @@
     <meta name="theme-color"
           content="#1565c0">
 
+    <meta name="description"
+          content="Koleksi Lirik Lagu Rohani karya Selsires Kirihio">
+
+    <meta name="mobile-web-app-capable"
+          content="yes">
+
+    <meta name="apple-mobile-web-app-capable"
+          content="yes">
+
+    <meta name="apple-mobile-web-app-status-bar-style"
+          content="default">
+
+    <meta name="apple-mobile-web-app-title"
+          content="Koleksi Lirik Lagu">
+
+
     <title>Koleksi Lirik Lagu</title>
 
+
+    <!-- ==================================================
+         PWA MANIFEST
+         ================================================== -->
+
     <link rel="manifest"
-          href="manifest.json">
+          href="./manifest.json">
+
+
+    <!-- ==================================================
+         CSS
+         ================================================== -->
 
     <link rel="stylesheet"
-          href="css/style.css">
+          href="./css/style.css">
+
 
 </head>
 
+
 <body>
+
+
+<!-- =====================================================
+     HEADER
+     ===================================================== -->
 
 <header>
 
     <h1>🎵 Koleksi Lirik Lagu</h1>
 
-    <button id="btnInstall" hidden>
+
+    <!-- =================================================
+         TOMBOL INSTALL PWA
+         ================================================= -->
+
+    <button
+        id="btnInstall"
+        type="button"
+        hidden>
+
         📲 Install Aplikasi
+
     </button>
+
 
 </header>
 
+
+
+<!-- =====================================================
+     MAIN
+     ===================================================== -->
+
 <main>
 
+
+    <!-- =================================================
+         SIDEBAR
+         ================================================= -->
+
     <aside id="sidebar">
+
 
         <input
             type="text"
             id="cari"
             placeholder="🔍 Cari lagu...">
 
+
         <div id="daftarLagu">
+
             Memuat daftar lagu...
+
         </div>
+
 
     </aside>
 
+
+
+    <!-- =================================================
+         CONTENT
+         ================================================= -->
+
     <section id="content">
+
 
         <h2>Selamat Datang</h2>
 
+
         <p>
-            Frontend GitHub Pages berhasil dibuat.
+            Koleksi Lirik Lagu Rohani
         </p>
+
 
         <div id="lirik"></div>
 
+
     </section>
+
 
 </main>
 
-<script src="js/app.js"></script>
+
+
+<!-- =====================================================
+     JAVASCRIPT UTAMA
+     ===================================================== -->
+
+<script src="./js/app.js"></script>
+
+
+
+<!-- =====================================================
+     PWA INSTALL + SERVICE WORKER
+     ===================================================== -->
 
 <script>
 
-/******************************************************
- * Service Worker
- ******************************************************/
 
-if ("serviceWorker" in navigator) {
-
-    window.addEventListener("load", async () => {
-
-        try {
-
-            const reg = await navigator.serviceWorker.register("./sw.js");
-
-            console.log("Service Worker berhasil.");
-
-            console.log(reg);
-
-        }
-
-        catch (err) {
-
-            console.error("Service Worker gagal.");
-
-            console.error(err);
-
-        }
-
-    });
-
-}
-
-
-/******************************************************
- * Install PWA
- ******************************************************/
+/* ======================================================
+   PWA INSTALL
+   ====================================================== */
 
 let deferredPrompt = null;
+
 
 const btnInstall =
     document.getElementById("btnInstall");
 
 
-window.addEventListener("beforeinstallprompt", (e) => {
 
-    console.log("beforeinstallprompt");
+/* ======================================================
+   CEK APAKAH SUDAH BERJALAN SEBAGAI PWA
+   ====================================================== */
 
-    e.preventDefault();
+function isPWAInstalled() {
 
-    deferredPrompt = e;
+    return (
 
-    btnInstall.hidden = false;
+        window.matchMedia(
+            "(display-mode: standalone)"
+        ).matches
 
-});
+        ||
+
+        window.navigator.standalone === true
+
+    );
+
+}
 
 
-btnInstall.addEventListener("click", async () => {
 
-    if (!deferredPrompt) {
+/* ======================================================
+   JIKA SUDAH MENJADI PWA
+   SEMBUNYIKAN TOMBOL INSTALL
+   ====================================================== */
 
-        alert("Aplikasi belum siap untuk diinstall.");
+if (isPWAInstalled()) {
 
-        return;
+    if (btnInstall) {
+
+        btnInstall.hidden = true;
 
     }
 
-    deferredPrompt.prompt();
-
-    const result =
-        await deferredPrompt.userChoice;
-
-    console.log(result);
-
-    deferredPrompt = null;
-
-    btnInstall.hidden = true;
-
-});
+}
 
 
-window.addEventListener("appinstalled", () => {
 
-    console.log("Aplikasi berhasil diinstall.");
+/* ======================================================
+   BROWSER MEMBERIKAN IZIN INSTALL
+   ====================================================== */
 
-    btnInstall.hidden = true;
+window.addEventListener(
+    "beforeinstallprompt",
+    function(event) {
 
-});
+
+        console.log(
+            "PWA siap untuk di-install."
+        );
+
+
+        /*
+         * Mencegah Chrome langsung menampilkan
+         * dialog instalasi.
+         */
+
+        event.preventDefault();
+
+
+        /*
+         * Simpan event untuk tombol Install.
+         */
+
+        deferredPrompt = event;
+
+
+        /*
+         * Tampilkan tombol.
+         */
+
+        if (
+            btnInstall
+            &&
+            !isPWAInstalled()
+        ) {
+
+            btnInstall.hidden = false;
+
+        }
+
+
+    }
+);
+
+
+
+/* ======================================================
+   TOMBOL INSTALL DIKLIK
+   ====================================================== */
+
+if (btnInstall) {
+
+
+    btnInstall.addEventListener(
+        "click",
+        async function() {
+
+
+            /*
+             * Jika browser belum memberikan
+             * prompt instalasi.
+             */
+
+            if (!deferredPrompt) {
+
+                alert(
+                    "Aplikasi belum siap untuk di-install."
+                );
+
+                return;
+
+            }
+
+
+            console.log(
+                "Menampilkan dialog instalasi PWA..."
+            );
+
+
+            /*
+             * Tampilkan dialog Install.
+             */
+
+            deferredPrompt.prompt();
+
+
+            /*
+             * Tunggu pilihan pengguna.
+             */
+
+            const result =
+                await deferredPrompt.userChoice;
+
+
+            console.log(
+                "Hasil instalasi:",
+                result.outcome
+            );
+
+
+            /*
+             * Prompt hanya dapat digunakan
+             * satu kali.
+             */
+
+            deferredPrompt = null;
+
+
+            /*
+             * Sembunyikan tombol.
+             */
+
+            btnInstall.hidden = true;
+
+
+        }
+    );
+
+}
+
+
+
+/* ======================================================
+   APLIKASI BERHASIL DI-INSTALL
+   ====================================================== */
+
+window.addEventListener(
+    "appinstalled",
+    function() {
+
+
+        console.log(
+            "Koleksi Lirik Lagu berhasil di-install."
+        );
+
+
+        deferredPrompt = null;
+
+
+        if (btnInstall) {
+
+            btnInstall.hidden = true;
+
+        }
+
+
+    }
+);
+
+
+
+/* ======================================================
+   SERVICE WORKER
+   ====================================================== */
+
+if ("serviceWorker" in navigator) {
+
+
+    window.addEventListener(
+        "load",
+        async function() {
+
+
+            try {
+
+
+                const registration =
+                    await navigator.serviceWorker.register(
+                        "./sw.js",
+                        {
+                            scope: "./"
+                        }
+                    );
+
+
+                console.log(
+                    "Service Worker berhasil terdaftar."
+                );
+
+
+                console.log(
+                    "Scope:",
+                    registration.scope
+                );
+
+
+            }
+
+            catch (error) {
+
+
+                console.error(
+                    "Service Worker gagal."
+                );
+
+
+                console.error(
+                    error
+                );
+
+
+            }
+
+
+        }
+    );
+
+
+}
+
 
 </script>
+
+
 
 </body>
 
