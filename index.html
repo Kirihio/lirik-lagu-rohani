@@ -67,7 +67,8 @@
 
     <button
         id="btnInstall"
-        type="button">
+        type="button"
+        hidden>
 
         📲 Install Aplikasi
 
@@ -92,11 +93,20 @@
     <aside id="sidebar">
 
 
+        <!-- =================================================
+             PENCARIAN
+             ================================================= -->
+
         <input
             type="text"
             id="cari"
-            placeholder="🔍 Cari lagu...">
+            placeholder="🔍 Cari lagu..."
+            autocomplete="off">
 
+
+        <!-- =================================================
+             DAFTAR LAGU
+             ================================================= -->
 
         <div id="daftarLagu">
 
@@ -150,7 +160,7 @@
 
 
 /* ======================================================
-   PWA INSTALL
+   KONFIGURASI PWA
    ====================================================== */
 
 let deferredPrompt = null;
@@ -158,6 +168,28 @@ let deferredPrompt = null;
 
 const btnInstall =
     document.getElementById("btnInstall");
+
+
+
+/* ======================================================
+   LOG PEMBUKAAN
+   ====================================================== */
+
+console.log(
+    "===================================="
+);
+
+console.log(
+    "KOLEKSI LIRIK LAGU - PWA"
+);
+
+console.log(
+    "PWA INSTALL SCRIPT AKTIF"
+);
+
+console.log(
+    "===================================="
+);
 
 
 
@@ -182,6 +214,12 @@ function isPWAInstalled() {
 }
 
 
+console.log(
+    "PWA sudah terinstall:",
+    isPWAInstalled()
+);
+
+
 
 /* ======================================================
    JIKA SUDAH MENJADI PWA
@@ -201,7 +239,7 @@ if (isPWAInstalled()) {
 
 
 /* ======================================================
-   BROWSER MEMBERIKAN IZIN INSTALL
+   EVENT BEFOREINSTALLPROMPT
    ====================================================== */
 
 window.addEventListener(
@@ -210,27 +248,42 @@ window.addEventListener(
 
 
         console.log(
-    "PWA: beforeinstallprompt TERPANGGIL — aplikasi siap di-install."
-);
+            "===================================="
+        );
+
+
+        console.log(
+            "BEFOREINSTALLPROMPT TERDETEKSI"
+        );
+
+
+        console.log(
+            "PWA siap untuk di-install."
+        );
+
+
+        console.log(
+            "===================================="
+        );
 
 
         /*
-         * Mencegah Chrome langsung menampilkan
-         * dialog instalasi.
+         * Mencegah Chrome langsung
+         * menampilkan dialog instalasi.
          */
 
         event.preventDefault();
 
 
         /*
-         * Simpan event untuk tombol Install.
+         * Simpan event.
          */
 
         deferredPrompt = event;
 
 
         /*
-         * Tampilkan tombol.
+         * Tampilkan tombol Install.
          */
 
         if (
@@ -261,16 +314,41 @@ if (btnInstall) {
         async function() {
 
 
+            console.log(
+                "===================================="
+            );
+
+
+            console.log(
+                "TOMBOL INSTALL DIKLIK"
+            );
+
+
+            console.log(
+                "deferredPrompt:",
+                deferredPrompt
+            );
+
+
+            console.log(
+                "===================================="
+            );
+
+
             /*
-             * Jika browser belum memberikan
-             * prompt instalasi.
+             * Jika Chrome belum memberikan
+             * beforeinstallprompt.
              */
 
             if (!deferredPrompt) {
 
+
                 alert(
-                    "Aplikasi belum siap untuk di-install."
+                    "Aplikasi belum siap untuk di-install.\n\n" +
+                    "Pastikan halaman dibuka melalui HTTPS " +
+                    "dan tunggu beberapa detik."
                 );
+
 
                 return;
 
@@ -278,12 +356,12 @@ if (btnInstall) {
 
 
             console.log(
-                "Menampilkan dialog instalasi PWA..."
+                "Menampilkan dialog Install PWA..."
             );
 
 
             /*
-             * Tampilkan dialog Install.
+             * Tampilkan dialog instalasi.
              */
 
             deferredPrompt.prompt();
@@ -304,15 +382,15 @@ if (btnInstall) {
 
 
             /*
-             * Prompt hanya dapat digunakan
-             * satu kali.
+             * Event hanya dapat digunakan sekali.
              */
 
             deferredPrompt = null;
 
 
             /*
-             * Sembunyikan tombol.
+             * Sembunyikan tombol setelah
+             * prompt digunakan.
              */
 
             btnInstall.hidden = true;
@@ -326,7 +404,7 @@ if (btnInstall) {
 
 
 /* ======================================================
-   APLIKASI BERHASIL DI-INSTALL
+   EVENT APPINSTALLED
    ====================================================== */
 
 window.addEventListener(
@@ -335,7 +413,17 @@ window.addEventListener(
 
 
         console.log(
-            "Koleksi Lirik Lagu berhasil di-install."
+            "===================================="
+        );
+
+
+        console.log(
+            "KOLEKSI LIRIK LAGU BERHASIL DI-INSTALL"
+        );
+
+
+        console.log(
+            "===================================="
         );
 
 
@@ -364,6 +452,11 @@ if ("serviceWorker" in navigator) {
     window.addEventListener(
         "load",
         async function() {
+
+
+            console.log(
+                "Mendaftarkan Service Worker..."
+            );
 
 
             try {
@@ -412,6 +505,15 @@ if ("serviceWorker" in navigator) {
 
 
 }
+else {
+
+
+    console.warn(
+        "Browser tidak mendukung Service Worker."
+    );
+
+
+}
 
 
 </script>
@@ -421,3 +523,4 @@ if ("serviceWorker" in navigator) {
 </body>
 
 </html>
+
